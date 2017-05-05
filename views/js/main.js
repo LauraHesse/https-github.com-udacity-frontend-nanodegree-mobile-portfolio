@@ -18,7 +18,7 @@ cameron *at* udacity *dot* com
 
 // As you may have realized, this website randomly generates pizzas.
 // Here are arrays of all possible pizza ingredients.
-var items;
+
 
 var pizzaIngredients = {};
 pizzaIngredients.meats = [
@@ -499,6 +499,8 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
 // Moves the sliding background pizzas based on scroll position
+var items;
+
 function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
