@@ -501,21 +501,11 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
- // var items = document.querySelectorAll('.mover');
- //
- var cachedLength = items.length;
- var top = document.body.scrollTop; // Scroll bar Y position.
- var constArray = [];
-
- for (var i = 0; i < 5; i++) {
-    constArray.push(Math.sin((top / 1250) + i));
+  var items = document.querySelectorAll('.mover');
+  for (var i = 0; i < items.length; i++) {
+    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
-
- // Source: https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/8
- for (var i = 0; i < cachedLength; i++) {
-   var phase = constArray[i % 5];
-   items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
- }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
   // Super easy to create custom metrics.
