@@ -507,7 +507,7 @@ function updatePositions() {
   //created a global variable instead of being called all the time
 
   //contain all elements in more optimized variable
-  var optItemLenght = item.length;
+  var optItemLenght = items.length;
   var bringTop = (document.body.scrollTop / 1250);
   var phase;
 
@@ -515,7 +515,7 @@ function updatePositions() {
    // Source: https://github.com/dvampofo/webOptimization/blob/master/views/js/main.js and https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/8
    var loopArray = [];
 
-   for (var i = 0; i < 5; i ++){ // running thought 5 values
+   for (var i = 0; i < 5; i ++){ // running throught 5 values
      loopArray.push(Math.sin(bringTop + i)); //Math.sin((document.body.scrollTop / 1250) + (i % 5));
    }
 
