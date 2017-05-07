@@ -18,8 +18,6 @@ cameron *at* udacity *dot* com
 
 // As you may have realized, this website randomly generates pizzas.
 // Here are arrays of all possible pizza ingredients.
-
-
 var pizzaIngredients = {};
 pizzaIngredients.meats = [
   "Pepperoni",
@@ -499,33 +497,34 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
 // Moves the sliding background pizzas based on scroll position
-var items;
+//
+var items; //creating global variables intead
 
 function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  //var items = document.querySelectorAll('.mover');
-  //created a global variable instead of being called all the time
-
-  //contain all elements in more optimized variable
-  var optItemLenght = items.length;
-  var bringTop = (document.body.scrollTop / 1250);
+  //creating local variables for easy access
+  var itemsLength = items.length;
   var phase;
+  var top = (document.body.scrollTop / 1250);
 
+  //var items = document.querySelectorAll('.mover');
+  //this main loop sets style ".style.left" for each of the pizzas - check .style.transform to offset position
+  // items[i].style.left = items[i].basicLeft + 100 * phase[i % 5] + 'px';
+  //reference - https://discussions.udacity.com/t/pizza-sliding-issue/202664
 
-  //  for-loop does all the job, why not give it an access from an empty Array
-   // Source: https://github.com/dvampofo/webOptimization/blob/master/views/js/main.js and https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/8
-   var loopArray = [];
+  var phaseArray = []; //creating an empty Array and generating it outside the for-loop
+  for (var i = 0; i < 5; i++) {
+    phaseArray.push(Math.sin(top + i));
+  }
 
-   for (var i = 0; i < 5; i ++){ // By lowering their amount, we can save a lot of computations
-     loopArray.push(Math.sin(bringTop + i)); //Math.sin((document.body.scrollTop / 1250) + (i % 5));
-   }
-
-   //i wanna Pizzas on my page
-   for (var l = 0; l < optItemLenght; l++) {
-     phase = optItemLenght[l % 5]; //(i % 5)
-    items[l].style.left = items[l].basicLeft + 100 * phase + 'px';
+  // Reposition the pizzas
+  for (var l = 0; l < itemsLength; l++){
+    phase = phaseArray[l % 5];
+    //https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/17
+    //updatePositions main loop is setting the style.left of each of those pizza elements. This is a layout invalidator. We can look into using transform to offset position instead in combo with what is called a "z layer hack"
+    items[l].style.transform = 'translateX(' + (100 * phase) + 'px)';
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -545,16 +544,41 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 30; i++) {
-    var elem = document.createElement('img');
+  var elem; // variable outside the loop
+  var allPizzas = 32;
+
+  var movingPizzas = document.getElementById("movingPizzas1"); //get id out of the loop,prevent from multiple calling
+
+  // recalculate cols and rows based on device browser window
+  // https://github.com/uncleoptimus/udacityP4/blob/gh-pages/views/js/main.js
+	cols = Math.ceil(window.innerWidth / (s - 73.33)); // factoring in img width for better effect
+	rows = Math.ceil(window.innerHeight / s);
+	allPizzas = cols * rows;
+
+
+  for (var i = 0; i < allPizzas; i++) { // instead of 200 pizzas have only 32 that are visible
+    elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
     elem.style.height = "100px";
     elem.style.width = "73.333px";
-    elem.basicLeft = (i % cols) * s;
+    elem.style.left = (i % cols) * s + 'px';
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
+    movingPizzas.appendChild(elem); // add all the pizzas
   }
 
+  // Logs the average amount of time per 10 frames needed to move the sliding background pizzas on scroll.
+  // https://discussions.udacity.com/t/pizza-page-comments/3007
+    function logAverageFrame(times) {   // times is the array of User Timing measurements from updatePositions()
+      var numberOfEntries = times.length;
+      var sum = 0;
+      for (var i = numberOfEntries - 1; i > numberOfEntries - 11; i--) {
+        sum = sum + times[i].duration;
+      }
+      console.log("Average time to generate last 10 frames: " + sum / 10 + "ms");
+    }
+
+ //Move items out to prevent updatePositions from re-drawing when scrolling
   items = document.getElementsByClassName('mover');
   updatePositions();
 });
