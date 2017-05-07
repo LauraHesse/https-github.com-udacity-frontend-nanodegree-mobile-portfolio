@@ -513,17 +513,18 @@ function updatePositions() {
   var bringTop = (document.body.scrollTop / 1250);
   var phase;
 
+
   //  for-loop does all the job, why not give it an access from an empty Array
    // Source: https://github.com/dvampofo/webOptimization/blob/master/views/js/main.js and https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/8
    var loopArray = [];
 
-   for (var i = 0; i < 5; i ++){ // running throught 5 values
+   for (var i = 0; i < 5; i ++){ // By lowering their amount, we can save a lot of computations
      loopArray.push(Math.sin(bringTop + i)); //Math.sin((document.body.scrollTop / 1250) + (i % 5));
    }
 
    //i wanna Pizzas on my page
    for (var l = 0; l < optItemLenght; l++) {
-     phase = optItemLenght[l % 5];
+     phase = optItemLenght[l % 5]; //(i % 5)
     items[l].style.left = items[l].basicLeft + 100 * phase + 'px';
   }
 
@@ -544,7 +545,7 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  for (var i = 0; i < 30; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
@@ -552,7 +553,8 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
-    document.querySelector("#movingPizzas1").appendChild(elem);
   }
+
+  items = document.getElementsByClassName('mover');
   updatePositions();
 });
