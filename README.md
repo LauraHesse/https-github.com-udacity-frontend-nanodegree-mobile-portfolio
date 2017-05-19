@@ -72,7 +72,9 @@ File compressed: pizza.html
 1. In HTML, removed all the comment and unnecessary space to reduce file size.
 1. Images were all replaced to compressed ones  
 
-File compressed: main.js
+##File compressed: main.js
+---
+1. changePizzaSizes function - for loop was optimized to meet specifications for the pizza resize.
 
 ```javascript
 // Iterates through pizza elements on the page and changes their widths
@@ -86,9 +88,9 @@ function changePizzaSizes(size) {
   }
 }
 ```
-
-1. changePizzaSizes function - for loop was optimized to meet specifications for the pizza resize.
 ---
+2. Removed the calculations from the for loop.
+
 ```javascript
 // Moves the sliding background pizzas based on scroll position
 //
@@ -121,9 +123,9 @@ function updatePositions() {
     items[l].style.transform = 'translateX(' + (100 * phase) + 'px)';
   }
 ```
-
-1. Removed the calculations from the for loop.
 ---
+3. Dynamically calculating how many scrolling pizzas are needed for the user's screen.
+
 ```javascript
 // Reposition the pizzas
   for (var l = 0; l < itemsLength; l++){
@@ -161,4 +163,3 @@ document.addEventListener('DOMContentLoaded', function() {
 	rows = Math.ceil(window.innerHeight / s);
 	allPizzas = cols * rows;
 ```
-1. Dynamically calculating how many scrolling pizzas are needed for the user's screen.
