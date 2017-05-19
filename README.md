@@ -32,7 +32,7 @@ Profile, optimize, measure... and then lather, rinse, and repeat. Good luck!
 
 #### Part 2: Optimize Frames per Second in pizza.html
 
-To optimize views/pizza.html, you will need to modify views/js/main.js until your frames per second rate is 60 fps or higher. You will find instructive comments in main.js. 
+To optimize views/pizza.html, you will need to modify views/js/main.js until your frames per second rate is 60 fps or higher. You will find instructive comments in main.js.
 
 You might find the FPS Counter/HUD Display useful in Chrome developer tools described here: [Chrome Dev Tools tips-and-tricks](https://developer.chrome.com/devtools/docs/tips-and-tricks).
 
@@ -53,3 +53,112 @@ The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstra
 
 * <a href="http://getbootstrap.com/css/">Bootstrap's CSS Classes</a>
 * <a href="http://getbootstrap.com/components/">Bootstrap's Components</a>
+
+#Website optomization
+---
+Files compressed: To Index.html, project-2048.html, project-mobile.html, project-webperf.html:
+
+1. Added a @font-face request for Google fonts
+1. Inlined CSS to prevent bocking page load.
+1. Added media=print for "print" media query
+1. JS has async and defer tag to avoid blocking page load.
+1. Image links were replaced by dowloaded and compressed images.
+1. In HTML, removed all the comment and unnecessary space to reduce file size.
+
+File compressed: pizza.html
+
+1. JS has async and defer tag to avoid blocking page load.
+1. Inlined (crazy) compressed Bootstrap classes to prevent page blocking
+1. In HTML, removed all the comment and unnecessary space to reduce file size.
+1. Images were all replaced to compressed ones  
+
+File compressed: main.js
+
+```javascript
+// Iterates through pizza elements on the page and changes their widths
+function changePizzaSizes(size) {
+    var i;
+    var container = document.getElementsByClassName('randomPizzaContainer');
+    var dx = determineDx(container[0], size);
+    var newwidth = (container[0].offsetWidth + dx) + 'px';
+  for (i = 0; i < container.length; i++) {
+    container[i].style.width = newwidth;
+  }
+}
+```
+
+1. changePizzaSizes function - for loop was optimized to meet specifications for the pizza resize.
+---
+```javascript
+// Moves the sliding background pizzas based on scroll position
+//
+var items; //creating global variables intead
+
+function updatePositions() {
+  frame++;
+  window.performance.mark("mark_start_frame");
+
+  //creating local variables for easy access
+  var itemsLength = items.length;
+  var phase;
+  var top = (document.body.scrollTop / 1250);
+
+  //var items = document.querySelectorAll('.mover');
+  //this main loop sets style ".style.left" for each of the pizzas - check .style.transform to offset position
+  // items[i].style.left = items[i].basicLeft + 100 * phase[i % 5] + 'px';
+  //reference - https://discussions.udacity.com/t/pizza-sliding-issue/202664
+
+  var phaseArray = []; //creating an empty Array and generating it outside the for-loop
+  for (var i = 0; i < 5; i++) {
+    phaseArray.push(Math.sin(top + i));
+  }
+
+  // Reposition the pizzas
+  for (var l = 0; l < itemsLength; l++){
+    phase = phaseArray[l % 5];
+    //https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/17
+    //updatePositions main loop is setting the style.left of each of those pizza elements. This is a layout invalidator. We can look into using transform to offset position instead in combo with what is called a "z layer hack"
+    items[l].style.transform = 'translateX(' + (100 * phase) + 'px)';
+  }
+```
+
+1. Removed the calculations from the for loop.
+---
+```javascript
+// Reposition the pizzas
+  for (var l = 0; l < itemsLength; l++){
+    phase = phaseArray[l % 5];
+    //https://discussions.udacity.com/t/project-4-how-do-i-optimize-the-background-pizzas-for-loop/36302/17
+    //updatePositions main loop is setting the style.left of each of those pizza elements. This is a layout invalidator. We can look into using transform to offset position instead in combo with what is called a "z layer hack"
+    items[l].style.transform = 'translateX(' + (100 * phase) + 'px)';
+  }
+
+  // User Timing API to the rescue again. Seriously, it's worth learning.
+  // Super easy to create custom metrics.
+  window.performance.mark("mark_end_frame");
+  window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
+  if (frame % 10 === 0) {
+    var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
+    logAverageFrame(timesToUpdatePosition);
+  }
+}
+
+// runs updatePositions on scroll
+window.addEventListener('scroll', updatePositions);
+
+// Generates the sliding pizzas when the page loads.
+document.addEventListener('DOMContentLoaded', function() {
+  var cols = 8;
+  var s = 256;
+  var elem; // variable outside the loop
+  var allPizzas = 32;
+
+  var movingPizzas = document.getElementById("movingPizzas1"); //get id out of the loop,prevent from multiple calling
+
+  // recalculate cols and rows based on device browser window
+  // https://github.com/uncleoptimus/udacityP4/blob/gh-pages/views/js/main.js
+	cols = Math.ceil(window.innerWidth / (s - 73.33)); // factoring in img width for better effect
+	rows = Math.ceil(window.innerHeight / s);
+	allPizzas = cols * rows;
+```
+1. Dynamically calculating how many scrolling pizzas are needed for the user's screen.
